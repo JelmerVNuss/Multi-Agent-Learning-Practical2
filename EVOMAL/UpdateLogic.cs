@@ -71,7 +71,18 @@ namespace EVOMAL
         /// scoreTable contains the score table created in the scoreTable method
         static public double[] replicator(double[] proportions, double[,] scoreTable, double birthrate)
         {
+            scoreTableStrategyAverage = calculate average
+            for strategy in all strategies
+                    proportionsStrategy = proportions[strategy];
+                scoreTableStrategy = vector multiplication proportion times row of score table
+                 proportions[strategy] = (proportionsstrategy * (1 + birthrate * scoreTableStrategy) ) / (1 + birthrate * scoreTableStrategyAverage)))
             return proportions;
         }
+
+        // TODO make function for vector multiplication proportions with row of score table
+        Strategy = i;
+        sum = 0;
+        for column j in columns
+            sum +=  proportion[j] * scoretable[i][j]
     }
 }
