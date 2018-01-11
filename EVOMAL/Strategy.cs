@@ -33,7 +33,7 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
-            return 0;
+            return 1;
         }
     }
 
@@ -41,7 +41,8 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
-            return 0;
+            Random random = new Random();
+            return random.Next(0, 2);
         }
     }
 
@@ -49,7 +50,16 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
-            return 0;
+            int action = 0;
+            if (yourhistory.Count != 0)
+            {
+                int lastOpponentAction = yourhistory.Last();
+                if (lastOpponentAction == 1)
+                {
+                    action = 1;
+                }
+            }
+            return action;
         }
     }
 
@@ -57,7 +67,17 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
-            return 0;
+            int action = 0;
+            if (yourhistory.Count != 0)
+            {
+                int lastOpponentAction = yourhistory.Last();
+                int secondLastOpponentAction = yourhistory[yourhistory.Count - 2];
+                if (lastOpponentAction == 1 && secondLastOpponentAction == 1)
+                {
+                    action = 1;
+                }
+            }
+            return action;
         }
     }
 
@@ -65,7 +85,24 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
-            return 0;
+            int action = 0;
+            if (myhistory.Count != 0 && yourhistory.Count != 0)
+            {
+                int lastOwnAction = myhistory.Last();
+                int lastOpponentAction = yourhistory.Last();
+
+                // Repeat last action.
+                action = lastOwnAction;
+
+                // Change action if you lose (you cooperate, opponent defects, or both defect).
+                if (lastOwnAction == 0 && lastOpponentAction == 1 ||
+                    lastOwnAction == 1 && lastOpponentAction == 1)
+                {
+                    // Flip action from cooperate to defect or defect to cooperate.
+                    action = 1 - action;
+                }
+            }
+            return action;
         }
     }
 
@@ -73,7 +110,28 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
-            return 0;
+            int action = 0;
+
+            if (myhistory.Count != 0 && yourhistory.Count != 0)
+            {
+                // Find first defect of opponent, then defect yourself.
+                int lastOpponentAction = yourhistory.Last();
+                if (lastOpponentAction == 1)
+                {
+                    action = 1;
+                }
+
+                // Keep defecting if your opponent defected once.
+                // This is checked in your own history: if you defected the previous round, the opponent must have defected once.
+                // This calculation is more optimal than checking the whole opponent's history.
+                int lastOwnAction = myhistory.Last();
+                if (lastOwnAction == 1)
+                {
+                    action = 1;
+                }
+            }
+
+            return action;
         }
     }
 
