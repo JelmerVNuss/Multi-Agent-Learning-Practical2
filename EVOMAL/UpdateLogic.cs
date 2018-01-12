@@ -65,18 +65,43 @@ namespace EVOMAL
             return payoff;    
         }
 
-        /// TODO STUDENT
         /// Returns the proportions for the next time step
         /// proportions contains the proportions at current time
         /// scoreTable contains the score table created in the scoreTable method
         static public double[] replicator(double[] proportions, double[,] scoreTable, double birthrate)
         {
-            scoreTableStrategyAverage = calculate average
-            for strategy in all strategies
-                    proportionsStrategy = proportions[strategy];
-                scoreTableStrategy = vector multiplication proportion times row of score table
-                 proportions[strategy] = (proportionsstrategy * (1 + birthrate * scoreTableStrategy) ) / (1 + birthrate * scoreTableStrategyAverage)))
-            return proportions;
+            double scoreTableAverage = calculateScoreTableAverage(scoreTable);
+            int amountOfRows = scoreTable.GetLength(0);
+            int amountOfColumns = scoreTable.GetLength(1);
+
+            double[] newProportions = new double[proportions.Length];
+
+            for (int strategyIndex = 0; strategyIndex < amountOfRows; strategyIndex++)
+            {
+                double proportionStrategy = proportions[strategyIndex];
+                //scoreTableStrategy = vector multiplication proportion times row of score table
+                double scoreTableStrategy = 0;
+                newProportions[strategyIndex] = (proportionStrategy * (1 + birthrate * scoreTableStrategy)) / (1 + birthrate * scoreTableAverage);
+            }
+            return newProportions;
+        }
+
+        static private double calculateScoreTableAverage(double[,] scoreTable)
+        {
+            double sum = 0;
+            int amountOfRows = scoreTable.GetLength(0);
+            int amountOfColumns = scoreTable.GetLength(1);
+
+            for (int i = 0; i < amountOfRows; i++)
+            {
+                for (int j = 0; j < amountOfColumns; j++)
+                {
+                    sum += scoreTable[i, j];
+                }
+            }
+
+            double average = sum / (amountOfRows * amountOfColumns);
+            return average;
         }
 
         // TODO make function for vector multiplication proportions with row of score table
