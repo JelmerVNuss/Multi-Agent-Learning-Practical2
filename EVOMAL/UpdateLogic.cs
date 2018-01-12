@@ -13,7 +13,8 @@ namespace EVOMAL
 {
     static class UpdateLogic
     {
-        /// TODO STUDENT
+        static Random random = new Random();
+
         /// Returns the score table for all 11 strategies
         /// strategies consists of 11 strategy objects
         static public double[,] scoreTable(int nrrounds, int nrrestarts, Strategy[] strategies, double noise)
@@ -21,29 +22,67 @@ namespace EVOMAL
             int numberOfStrategies = strategies.Length;
             double[,] scoreTable = new double[numberOfStrategies, numberOfStrategies];
 
-
-            double totalPayoff = 0;
-            // TODO for all strategy combinations
-            for (int i = 0; i < nrrestarts; i++)
+            for (int ownStrategyIndex = 0; ownStrategyIndex < numberOfStrategies; ownStrategyIndex++)
             {
-                for (int j = 0; j < nrrounds; j++)
+                for (int opponentStrategyIndex = 0; opponentStrategyIndex < numberOfStrategies; opponentStrategyIndex++)
                 {
-                    ownAction = ;// strategy1 action + noise
-                    if randomnumber < noise, choose random
-                        else use strategy action
-                    opponentsAction = ;// strategy2 action + noise
+                    double totalPayoff = 0;
 
-                    double payoff = getPayoff(ownAction, opponentsAction);
-
-                    totalPayoff += payoff;
+                    for (int gameNumber = 0; gameNumber < nrrestarts; gameNumber++)
+                    {
+                        Strategy ownStrategy = strategies[ownStrategyIndex];
+                        Strategy opponentStrategy = strategies[opponentStrategyIndex];
+                        double gamePayoff = playGame(nrrounds, ownStrategy, opponentStrategy, noise);
+                        totalPayoff += gamePayoff;
+                    }
+                    scoreTable[ownStrategyIndex, opponentStrategyIndex] = totalPayoff / (nrrestarts * nrrounds);
                 }
             }
-            // TODO add payoff to row/column scoretable, take average
-            scoreTable[ownStrategy, opponentsStrategy] = totalPayoff/(nrrestarts * nrrounds);
 
             return scoreTable;
         }
 
+
+        // Return total payoff after playing a complete game.
+        static private double playGame(int nrrounds, Strategy ownStrategy, Strategy opponentStrategy, double noise)
+        {
+            List<int> ownHistory = new List<int>();
+            List<int> opponentHistory = new List<int>();
+
+            double totalGamePayoff = 0;
+
+            for (int roundNumber = 0; roundNumber < nrrounds; roundNumber++)
+            {
+                double roundPayoff = playRound(ownStrategy, opponentStrategy, ownHistory, opponentHistory, noise);
+                totalGamePayoff += roundPayoff;
+            }
+
+            return totalGamePayoff;
+        }
+
+        // Return payoff after playing a round.
+        static private double playRound(Strategy ownStrategy, Strategy opponentStrategy, List<int> ownHistory, List<int> opponentHistory, double noise)
+        {
+            int ownAction = selectAction(ownStrategy, ownHistory, opponentHistory, noise);
+            int opponentAction = selectAction(opponentStrategy, opponentHistory, ownHistory, noise);
+
+            ownHistory.Add(ownAction);
+            opponentHistory.Add(opponentAction);
+
+            double payoff = getPayoff(ownAction, opponentAction);
+            return payoff;
+        }
+
+        static private int selectAction(Strategy ownStrategy, List<int> ownHistory, List<int> opponentHistory, double noise)
+        {
+            int ownAction = ownStrategy.getAction(ownHistory, opponentHistory);
+            // Select random action with a low noise probability.
+            if (random.NextDouble() < noise)
+            {
+                ownAction = random.Next(0, 2);
+            }
+            return ownAction;
+        }
 
 
         // TODO make double payoff type
