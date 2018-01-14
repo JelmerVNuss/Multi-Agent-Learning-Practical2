@@ -137,7 +137,17 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
-            return 0;
+            int timesOpponentDefect = yourhistory.FindAll(x => x == 1).Count();
+            int nrOfRounds = yourhistory.Count();
+            double[] opponentStrategy = { 1 - (timesOpponentDefect / nrOfRounds), (timesOpponentDefect / nrOfRounds) };
+
+            double expectedRewardDefect = opponentStrategy[0] * UpdateLogic.getPayoff(1, 0) + opponentStrategy[1] * UpdateLogic.getPayoff(1, 1);
+            double expectedRewardCooperate = opponentStrategy[0] * UpdateLogic.getPayoff(0, 0) + opponentStrategy[1] * UpdateLogic.getPayoff(0, 1);
+            double probabilityDefect = expectedRewardDefect / (expectedRewardDefect + expectedRewardCooperate);
+
+            int action = randomAction.proportionalAction(probabilityDefect);
+
+            return action;
         }
     }
 
@@ -163,20 +173,20 @@ namespace EVOMAL
             double regretCoorperation = (cooperationReward - trueReward) / nrOfRounds;
             double regretDefection = (defectionReward - trueReward) / nrOfRounds;
 
-            Random random = new Random();
-            double randomValue = random.NextDouble();
             if (regretDefection <= 0 && regretCoorperation <= 0)
             {
-                action = random.Next(0, 2);
+                action = randomAction.fullyRandomAction();
             }
-            else if (randomValue < (Math.Max(0, regretDefection) / (Math.Max(0, regretDefection) + Math.Max(0, regretCoorperation))))
+            else
             {
-                action = 1;
+                double probabilityDefect = Math.Max(0, regretDefection) / (Math.Max(0, regretDefection) + Math.Max(0, regretCoorperation));
+                action = randomAction.proportionalAction(probabilityDefect);
             }
+
             return action;
         }
 
-        private double getReward(List<int> myActions, List<int> yourActions)
+        public double getReward(List<int> myActions, List<int> yourActions)
         {
             int nrOfRounds = myActions.Count();
 
@@ -208,9 +218,9 @@ namespace EVOMAL
             }
             else if (timesDefected == timesCooperated)
             {
-                Random random = new Random();
-                action = random.Next(0, 2);
+                action = randomAction.fullyRandomAction();
             }
+
             return action;
         }
     }
@@ -219,17 +229,12 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
-            int action = 0;
-
             double valueDefect = getValue(myhistory, yourhistory, 1);
             double valueCooperate = getValue(myhistory, yourhistory, 0);
 
-            Random random = new Random();
-            double randomValue = random.NextDouble();
-            if (randomValue < (valueDefect / (valueDefect + valueCooperate)))
-            {
-                action = 1;
-            }
+            double probabilityDefect = valueDefect / (valueDefect + valueCooperate);
+            int action = randomAction.proportionalAction(probabilityDefect);
+
             return action;
         }
 
@@ -249,6 +254,29 @@ namespace EVOMAL
                 }
             }
             return rewardAction / roundsAction;
+        }
+    }
+
+
+    static class randomAction
+    {
+        public static int proportionalAction(double probabilityDefect)
+        {
+
+            int action = 0;
+            Random random = new Random();
+            double randomValue = random.NextDouble();
+            if (randomValue < (probabilityDefect))
+            {
+                action = 1;
+            }
+            return action;
+        }
+
+        public static int fullyRandomAction()
+        {
+            Random random = new Random();
+            return random.Next(0, 2);
         }
     }
 }
