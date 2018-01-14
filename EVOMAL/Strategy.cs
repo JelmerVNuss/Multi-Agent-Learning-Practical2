@@ -9,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-
-/// TODO STUDENT
 namespace EVOMAL
 {
     interface Strategy
