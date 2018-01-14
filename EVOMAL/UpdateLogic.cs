@@ -86,7 +86,7 @@ namespace EVOMAL
 
 
         // TODO make double payoff type
-        static private int getPayoff(int myAction, int yourAction)
+        static public int getPayoff(int myAction, int yourAction)
         {
             int payoff = 0; 
             if(myAction ==0 && yourAction ==0)
