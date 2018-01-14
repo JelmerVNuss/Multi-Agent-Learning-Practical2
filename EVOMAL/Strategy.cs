@@ -145,7 +145,48 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
-            return 0;
+            int action = 0;
+
+            int nrOfRounds = myhistory.Count();
+            List<int> cooperationOnly = new List<int>(nrOfRounds);
+            List<int> defectOnly = new List<int>(nrOfRounds);
+            for (int i = 0; i < nrOfRounds; i++)
+            {
+                cooperationOnly[i] = 0;
+                defectOnly[i] = 1;
+            }
+
+            double trueReward = getReward(myhistory, yourhistory);
+            double cooperationReward = getReward(cooperationOnly, yourhistory);
+            double defectionReward = getReward(defectOnly, yourhistory);
+
+            double regretCoorperation = (cooperationReward - trueReward) / nrOfRounds;
+            double regretDefection = (defectionReward - trueReward) / nrOfRounds;
+
+            Random random = new Random();
+            double randomValue = random.NextDouble();
+            if (regretDefection <= 0 && regretCoorperation <= 0)
+            {
+                action = random.Next(0, 2);
+            }
+            else if (randomValue < (Math.Max(0, regretDefection) / (Math.Max(0, regretDefection) + Math.Max(0, regretCoorperation))))
+            {
+                action = 1;
+            }
+            return action;
+        }
+
+        private double getReward(List<int> myActions, List<int> yourActions)
+        {
+            int nrOfRounds = myActions.Count();
+
+            double reward = 0;
+
+            for (int i = 0; i < nrOfRounds; i++)
+            {
+                reward += UpdateLogic.getPayoff(myActions[i], yourActions[i]);
+            }
+            return reward;
         }
     }
 
@@ -165,7 +206,36 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
-            return 0;
+            int action = 0;
+
+            double valueDefect = getValue(myhistory, yourhistory, 1);
+            double valueCooperate = getValue(myhistory, yourhistory, 0);
+
+            Random random = new Random();
+            double randomValue = random.NextDouble();
+            if (randomValue < (valueDefect / (valueDefect + valueCooperate)))
+            {
+                action = 1;
+            }
+            return action;
+        }
+
+        public double getValue(List<int> myhistory, List<int> yourhistory, int action)
+        {
+
+            int nrOfRounds = myhistory.Count();
+            int roundsAction = 0;
+            double rewardAction = 0;
+
+            for (int i = 0; i < nrOfRounds; i++)
+            {
+                if (myhistory[i] == action)
+                {
+                    rewardAction += UpdateLogic.getPayoff(myhistory[i], yourhistory[i]);
+                    roundsAction += 1;
+                }
+            }
+            return rewardAction / roundsAction;
         }
     }
 }
