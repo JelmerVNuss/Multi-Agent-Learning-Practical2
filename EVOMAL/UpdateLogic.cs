@@ -85,7 +85,6 @@ namespace EVOMAL
         }
 
 
-        // TODO make double payoff type
         static public int getPayoff(int myAction, int yourAction)
         {
             int payoff = 0; 
@@ -109,7 +108,7 @@ namespace EVOMAL
         /// scoreTable contains the score table created in the scoreTable method
         static public double[] replicator(double[] proportions, double[,] scoreTable, double birthrate)
         {
-            double scoreTableAverage = calculateScoreTableAverage(scoreTable);
+            double scoreTableAverage = calculateScoreTableAverage(scoreTable, proportions);
             int amountOfRows = scoreTable.GetLength(0);
             int amountOfColumns = scoreTable.GetLength(1);
 
@@ -118,35 +117,50 @@ namespace EVOMAL
             for (int strategyIndex = 0; strategyIndex < amountOfRows; strategyIndex++)
             {
                 double proportionStrategy = proportions[strategyIndex];
-                //scoreTableStrategy = vector multiplication proportion times row of score table
-                double scoreTableStrategy = 0;
+                double[] scoreTableRow = getRow(scoreTable, strategyIndex);
+                double scoreTableStrategy = vectorMultiplication(scoreTableRow, proportions);
                 newProportions[strategyIndex] = (proportionStrategy * (1 + birthrate * scoreTableStrategy)) / (1 + birthrate * scoreTableAverage);
             }
             return newProportions;
         }
 
-        static private double calculateScoreTableAverage(double[,] scoreTable)
+        static private double calculateScoreTableAverage(double[,] scoreTable, double[] proportions)
         {
-            double sum = 0;
             int amountOfRows = scoreTable.GetLength(0);
             int amountOfColumns = scoreTable.GetLength(1);
 
+            double[] averageRow = new double[amountOfRows];
             for (int i = 0; i < amountOfRows; i++)
             {
-                for (int j = 0; j < amountOfColumns; j++)
-                {
-                    sum += scoreTable[i, j];
-                }
+                double[] scoreTableRow = getRow(scoreTable, i);
+                averageRow[i] = vectorMultiplication(scoreTableRow, proportions);
             }
 
-            double average = sum / (amountOfRows * amountOfColumns);
+            double average = vectorMultiplication(proportions, averageRow);
             return average;
         }
 
-        // TODO make function for vector multiplication proportions with row of score table
-        Strategy = i;
-        sum = 0;
-        for column j in columns
-            sum +=  proportion[j] * scoretable[i][j]
+        static private double[] getRow(double[,] scoreTable, int row)
+        {
+            int amountOfColumns = scoreTable.GetLength(1);
+            double[] scoreTableRow = new double[amountOfColumns];
+
+            for (int col = 0; col < amountOfColumns; col++)
+            {
+                scoreTableRow[col] = scoreTable[row, col];
+            }
+            return scoreTableRow;
+        }
+
+        // function for vector multiplication proportions with row of score table
+        static private double vectorMultiplication(double[] scoreTableRow, double[] proportion)
+        {
+            double sum = 0;
+            for (int j = 0; j < proportion.Count(); j++)
+            {
+                sum += proportion[j] * scoreTableRow[j];
+            }
+            return sum;
+        }
     }
 }
