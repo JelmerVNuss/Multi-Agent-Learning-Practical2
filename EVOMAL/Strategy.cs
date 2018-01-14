@@ -194,10 +194,23 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
-            // Select the most occurring opponent action.
-            int action = yourhistory.GroupBy(s => s)
-                                    .OrderByDescending(s => s.Count())
-                                    .First().Key;
+            int action = 0;
+            int timesDefected = yourhistory.FindAll(x => x == 1).Count();
+            int timesCooperated = yourhistory.FindAll(x => x == 0).Count();
+
+            if (timesDefected > timesCooperated)
+            {
+                action = 1;
+            }
+            else if (timesDefected < timesCooperated)
+            {
+                action = 0;
+            }
+            else if (timesDefected == timesCooperated)
+            {
+                Random random = new Random();
+                action = random.Next(0, 2);
+            }
             return action;
         }
     }
