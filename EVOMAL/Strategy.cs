@@ -39,8 +39,8 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
-            Random random = new Random();
-            return random.Next(0, 2);
+            int action = randomAction.fullyRandomAction();
+            return action;
         }
     }
 
