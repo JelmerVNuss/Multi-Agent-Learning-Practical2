@@ -155,7 +155,11 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
-            return 0;
+            // Select the most occurring opponent action.
+            int action = yourhistory.GroupBy(s => s)
+                                    .OrderByDescending(s => s.Count())
+                                    .First().Key;
+            return action;
         }
     }
 
