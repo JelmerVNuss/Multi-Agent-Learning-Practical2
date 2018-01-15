@@ -269,11 +269,11 @@ namespace EVOMAL
 
     static class randomAction
     {
+        static Random random = new Random();
+
         public static int proportionalAction(double probabilityDefect)
         {
-
             int action = 0;
-            Random random = new Random();
             double randomValue = random.NextDouble();
             if (randomValue < (probabilityDefect))
             {
@@ -284,7 +284,6 @@ namespace EVOMAL
 
         public static int fullyRandomAction()
         {
-            Random random = new Random();
             return random.Next(0, 2);
         }
     }
