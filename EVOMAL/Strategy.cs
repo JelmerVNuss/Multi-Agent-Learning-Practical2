@@ -49,7 +49,7 @@ namespace EVOMAL
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
             int action = 0;
-            if (yourhistory.Count != 0)
+            if (yourhistory.Count > 0)
             {
                 int lastOpponentAction = yourhistory.Last();
                 if (lastOpponentAction == 1)
@@ -66,7 +66,7 @@ namespace EVOMAL
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
             int action = 0;
-            if (yourhistory.Count != 0)
+            if (yourhistory.Count > 1)
             {
                 int lastOpponentAction = yourhistory.Last();
                 int secondLastOpponentAction = yourhistory[yourhistory.Count - 2];
@@ -84,7 +84,7 @@ namespace EVOMAL
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
             int action = 0;
-            if (myhistory.Count != 0 && yourhistory.Count != 0)
+            if (myhistory.Count > 0 && yourhistory.Count > 0)
             {
                 int lastOwnAction = myhistory.Last();
                 int lastOpponentAction = yourhistory.Last();
@@ -110,7 +110,7 @@ namespace EVOMAL
         {
             int action = 0;
 
-            if (myhistory.Count != 0 && yourhistory.Count != 0)
+            if (myhistory.Count > 0 && yourhistory.Count > 0)
             {
                 // Find first defect of opponent, then defect yourself.
                 int lastOpponentAction = yourhistory.Last();
@@ -137,15 +137,21 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
+            int action = 0;
+
             int timesOpponentDefect = yourhistory.FindAll(x => x == 1).Count();
-            int nrOfRounds = yourhistory.Count();
-            double[] opponentStrategy = { 1 - (timesOpponentDefect / nrOfRounds), (timesOpponentDefect / nrOfRounds) };
+            int nrOfPlayedRounds = yourhistory.Count();
 
-            double expectedRewardDefect = opponentStrategy[0] * UpdateLogic.getPayoff(1, 0) + opponentStrategy[1] * UpdateLogic.getPayoff(1, 1);
-            double expectedRewardCooperate = opponentStrategy[0] * UpdateLogic.getPayoff(0, 0) + opponentStrategy[1] * UpdateLogic.getPayoff(0, 1);
-            double probabilityDefect = expectedRewardDefect / (expectedRewardDefect + expectedRewardCooperate);
+            if (nrOfPlayedRounds > 0)
+            {
+                double[] opponentStrategy = { 1 - (timesOpponentDefect / nrOfPlayedRounds), (timesOpponentDefect / nrOfPlayedRounds) };
 
-            int action = randomAction.proportionalAction(probabilityDefect);
+                double expectedRewardDefect = opponentStrategy[0] * UpdateLogic.getPayoff(1, 0) + opponentStrategy[1] * UpdateLogic.getPayoff(1, 1);
+                double expectedRewardCooperate = opponentStrategy[0] * UpdateLogic.getPayoff(0, 0) + opponentStrategy[1] * UpdateLogic.getPayoff(0, 1);
+                double probabilityDefect = expectedRewardDefect / (expectedRewardDefect + expectedRewardCooperate);
+
+                action = randomAction.proportionalAction(probabilityDefect);
+            }
 
             return action;
         }
@@ -158,29 +164,32 @@ namespace EVOMAL
             int action = 0;
 
             int nrOfRounds = myhistory.Count();
-            List<int> cooperationOnly = new List<int>(nrOfRounds);
-            List<int> defectOnly = new List<int>(nrOfRounds);
-            for (int i = 0; i < nrOfRounds; i++)
+            if (nrOfRounds > 0)
             {
-                cooperationOnly[i] = 0;
-                defectOnly[i] = 1;
-            }
+                List<int> cooperationOnly = new List<int>(nrOfRounds);
+                List<int> defectOnly = new List<int>(nrOfRounds);
+                for (int i = 0; i < nrOfRounds; i++)
+                {
+                    cooperationOnly.Add(0);
+                    defectOnly.Add(1);
+                }
 
-            double trueReward = getReward(myhistory, yourhistory);
-            double cooperationReward = getReward(cooperationOnly, yourhistory);
-            double defectionReward = getReward(defectOnly, yourhistory);
+                double trueReward = getReward(myhistory, yourhistory);
+                double cooperationReward = getReward(cooperationOnly, yourhistory);
+                double defectionReward = getReward(defectOnly, yourhistory);
 
-            double regretCoorperation = (cooperationReward - trueReward) / nrOfRounds;
-            double regretDefection = (defectionReward - trueReward) / nrOfRounds;
+                double regretCooperation = (cooperationReward - trueReward) / nrOfRounds;
+                double regretDefection = (defectionReward - trueReward) / nrOfRounds;
 
-            if (regretDefection <= 0 && regretCoorperation <= 0)
-            {
-                action = randomAction.fullyRandomAction();
-            }
-            else
-            {
-                double probabilityDefect = Math.Max(0, regretDefection) / (Math.Max(0, regretDefection) + Math.Max(0, regretCoorperation));
-                action = randomAction.proportionalAction(probabilityDefect);
+                if (regretDefection <= 0 && regretCooperation <= 0)
+                {
+                    action = randomAction.fullyRandomAction();
+                }
+                else
+                {
+                    double probabilityDefect = Math.Max(0, regretDefection) / (Math.Max(0, regretDefection) + Math.Max(0, regretCooperation));
+                    action = randomAction.proportionalAction(probabilityDefect);
+                }
             }
 
             return action;
