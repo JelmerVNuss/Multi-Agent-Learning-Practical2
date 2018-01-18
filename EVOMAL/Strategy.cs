@@ -23,6 +23,7 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
+            // Always cooperate
             return 0;
         }
     }
@@ -31,6 +32,7 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
+            // Always Defect
             return 1;
         }
     }
@@ -39,6 +41,7 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
+            // Get a random action
             int action = randomAction.fullyRandomAction();
             return action;
         }
@@ -48,6 +51,7 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
+            // Play cooperate, unless the last action of your opponent was to defect.
             int action = 0;
             if (yourhistory.Count > 0)
             {
@@ -65,6 +69,7 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
+            // Play cooperate, unless the last two actions of your opponent were to defect.
             int action = 0;
             if (yourhistory.Count > 1)
             {
@@ -139,17 +144,21 @@ namespace EVOMAL
         {
             int action = 0;
 
+            // Find the number of times the opponent defected and the total number of played rounds.
             int timesOpponentDefect = yourhistory.FindAll(x => x == 1).Count();
             int nrOfPlayedRounds = yourhistory.Count();
 
             if (nrOfPlayedRounds > 0)
             {
+                // Calculate the mixed strategy of your opponent. 
                 double[] opponentStrategy = { 1 - (timesOpponentDefect / nrOfPlayedRounds), (timesOpponentDefect / nrOfPlayedRounds) };
 
+                // Calculate the expected reward of your actions, given the strategy of the opponent.
                 double expectedRewardDefect = opponentStrategy[0] * UpdateLogic.getPayoff(1, 0) + opponentStrategy[1] * UpdateLogic.getPayoff(1, 1);
                 double expectedRewardCooperate = opponentStrategy[0] * UpdateLogic.getPayoff(0, 0) + opponentStrategy[1] * UpdateLogic.getPayoff(0, 1);
-                double probabilityDefect = expectedRewardDefect / (expectedRewardDefect + expectedRewardCooperate);
 
+                // Choose an action proportional to the expected reward of that action. 
+                double probabilityDefect = expectedRewardDefect / (expectedRewardDefect + expectedRewardCooperate);
                 action = randomAction.proportionalAction(probabilityDefect);
             }
 
@@ -166,6 +175,7 @@ namespace EVOMAL
             int nrOfRounds = myhistory.Count();
             if (nrOfRounds > 0)
             {
+                // Make a list of actions consisting of only zeros or ones, as if you only cooperated or defected in the game history. 
                 List<int> cooperationOnly = new List<int>(nrOfRounds);
                 List<int> defectOnly = new List<int>(nrOfRounds);
                 for (int i = 0; i < nrOfRounds; i++)
@@ -174,13 +184,16 @@ namespace EVOMAL
                     defectOnly.Add(1);
                 }
 
+                // Calculate the earned reward and the reward you would have earned by only cooperating or only defecting.
                 double trueReward = getReward(myhistory, yourhistory);
                 double cooperationReward = getReward(cooperationOnly, yourhistory);
                 double defectionReward = getReward(defectOnly, yourhistory);
 
+                // Calculate the regret of each action
                 double regretCooperation = (cooperationReward - trueReward) / nrOfRounds;
                 double regretDefection = (defectionReward - trueReward) / nrOfRounds;
 
+                // This picks each action with a probability proportional to its regret, or a random action if the regret of both actions is negative. 
                 if (regretDefection <= 0 && regretCooperation <= 0)
                 {
                     action = randomAction.fullyRandomAction();
@@ -198,9 +211,9 @@ namespace EVOMAL
         public double getReward(List<int> myActions, List<int> yourActions)
         {
             int nrOfRounds = myActions.Count();
-
             double reward = 0;
 
+            // This calculates the sum of the rewards earned in each round in history. 
             for (int i = 0; i < nrOfRounds; i++)
             {
                 reward += UpdateLogic.getPayoff(myActions[i], yourActions[i]);
@@ -214,9 +227,12 @@ namespace EVOMAL
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
             int action = 0;
+
+            // Find the number of times your opponent defected or cooperated in history. 
             int timesDefected = yourhistory.FindAll(x => x == 1).Count();
             int timesCooperated = yourhistory.FindAll(x => x == 0).Count();
 
+            // Choose the action you opponent played most, or a random action if the opponent played defect and cooperate equally often. 
             if (timesDefected > timesCooperated)
             {
                 action = 1;
@@ -238,9 +254,11 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
+            // Calculate the average of the rewards you gained in history when you played defect, and when you played cooperate. 
             double valueDefect = getValue(myhistory, yourhistory, 1);
             double valueCooperate = getValue(myhistory, yourhistory, 0);
 
+            // This picks each action with a probability proportional to the value of that action. 
             double probabilityDefect = valueDefect / (valueDefect + valueCooperate);
             int action = randomAction.proportionalAction(probabilityDefect);
 
@@ -249,11 +267,11 @@ namespace EVOMAL
 
         public double getValue(List<int> myhistory, List<int> yourhistory, int action)
         {
-
             int nrOfRounds = myhistory.Count();
             int roundsAction = 0;
             double rewardAction = 0;
 
+            // Calculate the sum of payoffs, earned when playing action.  
             for (int i = 0; i < nrOfRounds; i++)
             {
                 if (myhistory[i] == action)
@@ -262,6 +280,8 @@ namespace EVOMAL
                     roundsAction += 1;
                 }
             }
+
+            // returns the average payoff of action. 
             return rewardAction / roundsAction;
         }
     }
@@ -273,6 +293,7 @@ namespace EVOMAL
 
         public static int proportionalAction(double probabilityDefect)
         {
+            // Gives defect as action with probability probabilityDefect, and cooperate with probabbility 1-probabilityDefect
             int action = 0;
             double randomValue = random.NextDouble();
             if (randomValue < (probabilityDefect))
@@ -284,6 +305,7 @@ namespace EVOMAL
 
         public static int fullyRandomAction()
         {
+            // return 0 or 1 with equal probability. 
             return random.Next(0, 2);
         }
     }
