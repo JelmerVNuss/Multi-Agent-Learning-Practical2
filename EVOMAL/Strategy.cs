@@ -259,7 +259,7 @@ namespace EVOMAL
             double valueCooperate = getValue(myhistory, yourhistory, 0);
 
             // This picks each action with a probability proportional to the value of that action.
-            double probabilityDefect = 0.5;
+            double probabilityDefect = 0;
             if (valueDefect + valueCooperate > 0)
             {
                 probabilityDefect = valueDefect / (valueDefect + valueCooperate);
@@ -287,6 +287,7 @@ namespace EVOMAL
             // Returns the average payoff of action.
             if(roundsAction == 0)
             {
+                // set the initial estimate to an unrealistic high value to make the probability that each action is tried in the beginning high.
                 return 6;
             }
             else
