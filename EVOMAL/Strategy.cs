@@ -281,8 +281,20 @@ namespace EVOMAL
                 }
             }
 
+<<<<<<< HEAD
             // returns the average payoff of action. 
             return (rewardAction / roundsAction);
+=======
+            // Returns the average payoff of action.
+            if (roundsAction == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return rewardAction / roundsAction;
+            }
+>>>>>>> 20d29f7e797b938e29d6a983b376d7f2d878ce64
         }
     }
 
