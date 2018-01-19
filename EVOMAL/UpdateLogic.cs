@@ -87,6 +87,7 @@ namespace EVOMAL
        
         static public int getPayoff(int myAction, int yourAction)
         {
+            // get the payoff corresponding to myAction and yourAction
             int payoff = 0; 
             if(myAction ==0 && yourAction ==0)
             {
@@ -126,9 +127,11 @@ namespace EVOMAL
 
         static private double calculateScoreTableAverage(double[,] scoreTable, double[] proportions)
         {
+            // Calculate the average fitness of the whole population. 
             int amountOfRows = scoreTable.GetLength(0);
             int amountOfColumns = scoreTable.GetLength(1);
 
+            // First calculate the average fitness per row
             double[] averageRow = new double[amountOfRows];
             for (int i = 0; i < amountOfRows; i++)
             {
@@ -136,12 +139,14 @@ namespace EVOMAL
                 averageRow[i] = vectorMultiplication(scoreTableRow, proportions);
             }
 
+            // Now calculate the average over the averages of the rows.
             double average = vectorMultiplication(proportions, averageRow);
             return average;
         }
 
         static private double[] getRow(double[,] scoreTable, int row)
         {
+            // get one row of a matrix
             int amountOfColumns = scoreTable.GetLength(1);
             double[] scoreTableRow = new double[amountOfColumns];
 
