@@ -261,8 +261,12 @@ namespace EVOMAL
                 double valueDefect = getValue(myhistory, yourhistory, 1);
                 double valueCooperate = getValue(myhistory, yourhistory, 0);
 
-                // This picks each action with a probability proportional to the value of that action. 
-                double probabilityDefect = valueDefect / (valueDefect + valueCooperate);
+                // This picks each action with a probability proportional to the value of that action.
+                double probabilityDefect = 0;
+                if (valueDefect + valueCooperate > 0)
+                {
+                    probabilityDefect = valueDefect / (valueDefect + valueCooperate);
+                }
                 action = randomAction.proportionalAction(probabilityDefect);
             } 
             return action;
@@ -315,7 +319,7 @@ namespace EVOMAL
 
         public static int fullyRandomAction()
         {
-            // return 0 or 1 with equal probability. 
+            // Return 0 or 1 with equal probability. 
             return random.Next(0, 2);
         }
     }
