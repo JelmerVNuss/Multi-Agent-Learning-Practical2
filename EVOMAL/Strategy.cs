@@ -254,21 +254,23 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
-            int action = 0;
+            double valueDefect = 2;
+            double valueCooperate = 2;
+
             if (myhistory.Count > 0 && yourhistory.Count > 0)
             {
                 // Calculate the average of the rewards you gained in history when you played defect, and when you played cooperate. 
-                double valueDefect = getValue(myhistory, yourhistory, 1);
-                double valueCooperate = getValue(myhistory, yourhistory, 0);
+                valueDefect = getValue(myhistory, yourhistory, 1);
+                valueCooperate = getValue(myhistory, yourhistory, 0);
+            }
 
-                // This picks each action with a probability proportional to the value of that action.
-                double probabilityDefect = 0;
-                if (valueDefect + valueCooperate > 0)
-                {
-                    probabilityDefect = valueDefect / (valueDefect + valueCooperate);
-                }
-                action = randomAction.proportionalAction(probabilityDefect);
-            } 
+            // This picks each action with a probability proportional to the value of that action.
+            double probabilityDefect = 0;
+            if (valueDefect + valueCooperate > 0)
+            {
+                probabilityDefect = valueDefect / (valueDefect + valueCooperate);
+            }
+            int action = randomAction.proportionalAction(probabilityDefect);
             return action;
         }
 
