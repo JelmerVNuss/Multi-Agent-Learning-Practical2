@@ -287,7 +287,7 @@ namespace EVOMAL
             // Returns the average payoff of action.
             if(roundsAction == 0)
             {
-                return 2;
+                return 6;
             }
             else
             {
