@@ -282,7 +282,7 @@ namespace EVOMAL
             }
 
             // returns the average payoff of action. 
-            return rewardAction / roundsAction;
+            return (rewardAction / roundsAction);
         }
     }
 
