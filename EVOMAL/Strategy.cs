@@ -259,7 +259,7 @@ namespace EVOMAL
             double valueCooperate = getValue(myhistory, yourhistory, 0);
 
             // This picks each action with a probability proportional to the value of that action.
-            double probabilityDefect = 0;
+            double probabilityDefect = 0.5;
             if (valueDefect + valueCooperate > 0)
             {
                 probabilityDefect = valueDefect / (valueDefect + valueCooperate);
