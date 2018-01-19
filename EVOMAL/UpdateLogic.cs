@@ -84,7 +84,7 @@ namespace EVOMAL
             return ownAction;
         }
 
-
+       
         static public int getPayoff(int myAction, int yourAction)
         {
             int payoff = 0; 
