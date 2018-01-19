@@ -254,14 +254,17 @@ namespace EVOMAL
     {
         public int getAction(List<int> myhistory, List<int> yourhistory)
         {
-            // Calculate the average of the rewards you gained in history when you played defect, and when you played cooperate. 
-            double valueDefect = getValue(myhistory, yourhistory, 1);
-            double valueCooperate = getValue(myhistory, yourhistory, 0);
+            int action = 0;
+            if (myhistory.Count > 0 && yourhistory.Count > 0)
+            {
+                // Calculate the average of the rewards you gained in history when you played defect, and when you played cooperate. 
+                double valueDefect = getValue(myhistory, yourhistory, 1);
+                double valueCooperate = getValue(myhistory, yourhistory, 0);
 
-            // This picks each action with a probability proportional to the value of that action. 
-            double probabilityDefect = valueDefect / (valueDefect + valueCooperate);
-            int action = randomAction.proportionalAction(probabilityDefect);
-
+                // This picks each action with a probability proportional to the value of that action. 
+                double probabilityDefect = valueDefect / (valueDefect + valueCooperate);
+                action = randomAction.proportionalAction(probabilityDefect);
+            } 
             return action;
         }
 
@@ -281,12 +284,8 @@ namespace EVOMAL
                 }
             }
 
-<<<<<<< HEAD
-            // returns the average payoff of action. 
-            return (rewardAction / roundsAction);
-=======
             // Returns the average payoff of action.
-            if (roundsAction == 0)
+            if(roundsAction == 0)
             {
                 return 0;
             }
@@ -294,7 +293,6 @@ namespace EVOMAL
             {
                 return rewardAction / roundsAction;
             }
->>>>>>> 20d29f7e797b938e29d6a983b376d7f2d878ce64
         }
     }
 
